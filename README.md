@@ -6,7 +6,7 @@ Django and served by Nginx through `X-Accel-Redirect`.
 ## Install
 
 ```bash
-pip install django-nginx-presign
+pip install git+https://github.com/anuragregmi/django-nginx-presigned
 ```
 
 ## Django setup
