@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "django-nginx-presign"
+version = "0.1.0"
+description = "Django helpers for expiring Nginx X-Accel-Redirect media URLs."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+  { name = "Anurag" }
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Framework :: Django",
+  "Framework :: Django :: 4",
+  "Framework :: Django :: 5",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+  "Django>=4.2",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8",
+  "pytest-django>=4.8",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nginx_presign"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+pythonpath = ["src"]
+testpaths = ["tests"]
