@@ -18,9 +18,11 @@ INSTALLED_APPS = [
 
 MEDIA_URL = "/media/"
 
-NGINX_PRESIGN_BASE_URL = "https://example.com"
+NGINX_PRESIGN_BASE_URL = "http://127.0.0.1:8000"
 NGINX_PRESIGN_INTERNAL_PREFIX = "/protected-media/"
-NGINX_PRESIGN_DEFAULT_EXPIRES_IN = 300
+NGINX_PRESIGN_DEFAULT_EXPIRES_IN = 300  # seconds
+NGINX_PRESIGN_DEV_SERVE = False  # set True serve in django app during development
+NGINX_PRESIGN_ROUTE_PATH="/media"  # path you registered nginx_presign.urls to
 ```
 
 Add the validation endpoint:
@@ -29,7 +31,7 @@ Add the validation endpoint:
 from django.urls import include, path
 
 urlpatterns = [
-    path("nginx-presign/", include("nginx_presign.urls")),
+    path("media/", include("nginx_presign.urls")),
 ]
 ```
 
@@ -39,6 +41,12 @@ Generate an absolute expiring URL:
 from nginx_presign import generate_presigned_url
 
 url = generate_presigned_url("/media/uploads/report.pdf", expires_in=600)
+```
+
+Generated URLs preserve the media path and file extension:
+
+```text
+https://example.com/nginx-presign/uploads/report.pdf?token=...
 ```
 
 The generated URL points to Django. After validation, Django returns an empty
@@ -89,6 +97,9 @@ generate_presigned_url(file_url, expires_in=None, *, base_url=None) -> str
 
 `file_url` can be a media-relative path, a path beginning with `MEDIA_URL`, or a
 full URL whose path begins with `MEDIA_URL`.
+
+The signed token includes the media path. During validation, the view checks
+that the visible URL path matches the signed path before serving the file.
 
 Unsafe paths are rejected, including empty paths, filesystem absolute paths,
 backslash paths, and `..` traversal.

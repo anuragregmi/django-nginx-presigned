@@ -31,7 +31,7 @@ def test_head_request_returns_x_accel_redirect():
 
 
 def test_missing_token_returns_400():
-    response = Client().get("/nginx-presign/")
+    response = Client().get("/nginx-presign/uploads/report.pdf")
 
     assert response.status_code == 400
 
@@ -59,9 +59,16 @@ def test_post_returns_405():
 )
 def test_invalid_signed_payload_returns_400(payload):
     token = signing.dumps(payload, salt=get_signing_salt())
-    response = Client().get("/nginx-presign/", {"token": token})
+    response = Client().get("/nginx-presign/uploads/report.pdf", {"token": token})
 
     assert response.status_code == 400
+
+
+def test_signed_path_mismatch_returns_403():
+    url = generate_presigned_url("/media/uploads/report.pdf")
+    response = Client().get(_client_path_from_absolute_url(url).replace("report.pdf", "other.pdf"))
+
+    assert response.status_code == 403
 
 
 def test_expired_token_returns_403(monkeypatch):

@@ -1,4 +1,5 @@
 .venv/
+venv/
 __pycache__/
 *.py[cod]
 *$py.class
@@ -15,3 +16,5 @@ dist/
 .env
 .env.*
 !.env.example
+
+django_example/db.sqlite3

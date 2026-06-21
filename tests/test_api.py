@@ -20,7 +20,7 @@ def test_generate_presigned_url_uses_configured_absolute_base_url():
     parsed = urlsplit(url)
     assert parsed.scheme == "https"
     assert parsed.netloc == "cdn.example.test"
-    assert parsed.path == "/nginx-presign/"
+    assert parsed.path == "/nginx-presign/uploads/report.pdf"
 
     payload = signing.loads(_token_from_url(url), salt=get_signing_salt(), max_age=300)
     assert payload["path"] == "uploads/report.pdf"
@@ -33,12 +33,18 @@ def test_generate_presigned_url_supports_base_url_override():
     parsed = urlsplit(url)
     assert parsed.scheme == "https"
     assert parsed.netloc == "files.example.test"
-    assert parsed.path == "/root/nginx-presign/"
+    assert parsed.path == "/root/nginx-presign/uploads/report.pdf"
 
 
 @override_settings(NGINX_PRESIGN_ROUTE_PATH="private-media")
 def test_generate_presigned_url_uses_configured_route_path():
-    assert urlsplit(generate_presigned_url("uploads/report.pdf")).path == "/private-media/"
+    assert urlsplit(generate_presigned_url("uploads/report.pdf")).path == "/private-media/uploads/report.pdf"
+
+
+def test_generate_presigned_url_preserves_quoted_filename_extension():
+    url = generate_presigned_url("uploads/my report.final.pdf")
+
+    assert urlsplit(url).path == "/nginx-presign/uploads/my%20report.final.pdf"
 
 
 @pytest.mark.parametrize(

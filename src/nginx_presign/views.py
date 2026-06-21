@@ -6,10 +6,10 @@ from django.utils import timezone
 from django.views.static import serve as serve_static
 
 from .conf import get_dev_document_root, get_dev_serve_enabled, get_internal_prefix, get_signing_salt
-from .paths import build_internal_uri
+from .paths import build_internal_uri, normalize_media_path
 
 
-def serve_presigned_media(request):
+def serve_presigned_media(request, signed_path: str | None = None):
     if request.method not in ("GET", "HEAD"):
         return HttpResponseNotAllowed(["GET", "HEAD"])
 
@@ -23,6 +23,10 @@ def serve_presigned_media(request):
         expires_at = int(payload["exp"])
         if expires_at <= int(timezone.now().timestamp()):
             return HttpResponseForbidden("Expired token")
+        if not signed_path:
+            return HttpResponseBadRequest("Missing file path")
+        if normalize_media_path(signed_path) != relative_path:
+            return HttpResponseForbidden("Signed path mismatch")
         if get_dev_serve_enabled():
             return serve_static(request, relative_path, document_root=get_dev_document_root())
         internal_uri = build_internal_uri(relative_path, get_internal_prefix())

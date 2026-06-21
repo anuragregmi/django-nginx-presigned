@@ -25,5 +25,6 @@ def generate_presigned_url(file_url: str, expires_in: int | None = None, *, base
     public_base_url = get_base_url(base_url)
     route_path = get_route_path()
     route_url = urljoin(public_base_url.rstrip("/") + "/", route_path.lstrip("/"))
+    file_url_path = quote(relative_path, safe="/")
     query_string = urlencode({"token": token}, quote_via=quote)
-    return f"{route_url}?{query_string}"
+    return f"{route_url}{file_url_path}?{query_string}"
