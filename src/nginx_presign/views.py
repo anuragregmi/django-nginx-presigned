@@ -36,5 +36,9 @@ def serve_presigned_media(request, signed_path: str | None = None):
         return HttpResponseBadRequest("Invalid token payload")
 
     response = HttpResponse()
+    # Let Nginx set Content-Type from its mime.types for the internally served
+    # file. Django's default (text/html) would otherwise be forwarded via
+    # X-Accel-Redirect and make browsers render media as binary.
+    del response["Content-Type"]
     response["X-Accel-Redirect"] = internal_uri
     return response

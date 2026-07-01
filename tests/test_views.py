@@ -20,6 +20,8 @@ def test_valid_token_returns_x_accel_redirect():
     assert response.status_code == 200
     assert response["X-Accel-Redirect"] == "/protected-media/uploads/report.pdf"
     assert response.content == b""
+    # No Content-Type so Nginx applies its own mime.types to the served file.
+    assert "Content-Type" not in response
 
 
 def test_head_request_returns_x_accel_redirect():
